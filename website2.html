@@ -1,0 +1,778 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simple Learn UG</title>
+<style>
+:root {
+  --blue: #0759a8;
+  --green: #168447;
+  --light: #eef6ff;
+  --white: #ffffff;
+  --text: #172b3b;
+  --card: #ffffff;
+  --border: #d5e1ed;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--light);
+  color: var(--text);
+  font-size: 17px;
+  line-height: 1.6;
+}
+body.dark {
+  --light: #101b2a;
+  --white: #172538;
+  --text: #f1f6ff;
+  --card: #1c2d42;
+  --border: #3a4d63;
+}
+header {
+  background: var(--blue);
+  color: white;
+  padding: 22px 16px;
+  text-align: center;
+}
+header h1 { margin: 0; font-size: clamp(30px, 5vw, 44px); }
+header p { margin: 5px 0 14px; }
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+button, .download {
+  border: 0;
+  border-radius: 9px;
+  padding: 11px 15px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+button:focus, input:focus, select:focus, textarea:focus {
+  outline: 3px solid #f5c542;
+  outline-offset: 2px;
+}
+nav button { background: white; color: var(--blue); }
+button:hover { opacity: .88; }
+.green { background: var(--green); color: white; }
+.blue { background: var(--blue); color: white; }
+.red { background: #b42323; color: white; }
+.gray { background: #e2e8f0; color: #172b3b; }
+main { max-width: 1150px; margin: auto; padding: 16px; }
+section {
+  background: var(--white);
+  padding: 22px;
+  border-radius: 14px;
+  margin: 20px 0;
+  box-shadow: 0 3px 12px #0000000b;
+}
+h2 { color: var(--blue); margin-top: 0; }
+.dark h2 { color: #79baff; }
+input, select, textarea {
+  width: 100%;
+  max-width: 100%;
+  padding: 12px;
+  margin: 6px 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text);
+  font-size: 16px;
+}
+label { font-weight: bold; }
+.search { max-width: 700px; display: block; margin: 12px auto; }
+.subjects, .cards, .stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+}
+.subject-btn {
+  background: var(--card);
+  color: var(--blue);
+  border: 2px solid var(--blue);
+  min-height: 54px;
+}
+.subject-btn.active { background: var(--blue); color: white; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  min-width: 0;
+}
+.card h3 { margin-top: 0; overflow-wrap: anywhere; }
+.thumb {
+  background: #dceeff;
+  color: #0759a8;
+  border-radius: 8px;
+  min-height: 100px;
+  display: grid;
+  place-items: center;
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+video { width: 100%; border-radius: 8px; }
+iframe { width: 100%; aspect-ratio: 16 / 9; border: 0; }
+small, .muted { opacity: .8; }
+.form-panel {
+  border: 2px solid var(--green);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+}
+.hidden { display: none !important; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.row > * { flex: 1 1 180px; }
+.answer {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  margin: 7px 0;
+}
+.answer.correct { background: #d8f7df; color: #12572b; }
+.answer.wrong { background: #ffe0e0; color: #8b1616; }
+.feedback { font-weight: bold; min-height: 28px; }
+.stats .card { text-align: center; }
+.stats strong { display: block; font-size: 28px; color: var(--green); }
+footer {
+  background: #06345f;
+  color: white;
+  text-align: center;
+  padding: 26px 16px;
+}
+footer a { color: #bce0ff; }
+a { overflow-wrap: anywhere; }
+@media(max-width: 500px) {
+  body { font-size: 16px; }
+  main { padding: 9px; }
+  section { padding: 15px; }
+  button { max-width: 100%; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Simple Learn UG</h1>
+  <p>Learn Easy, Learn Anywhere</p>
+  <button class="green" onclick="toggleDark()" id="darkBtn">🌙 Dark Mode</button>
+  <nav>
+    <button onclick="go('home')">Home</button>
+    <button onclick="go('videos')">Videos</button>
+    <button onclick="go('research')">Research</button>
+    <button onclick="go('notes')">Notes</button>
+    <button onclick="go('quiz')">Quiz</button>
+    <button onclick="go('progress')">My Progress</button>
+  </nav>
+</header>
+
+<main>
+<section id="home">
+  <h2>Welcome to Simple Learn UG!</h2>
+  <p>Learn new things, watch lessons, read notes and test your knowledge.</p>
+  <input class="search" id="topicSearch" placeholder="Search any topic..."
+         oninput="searchTopics(this.value)">
+  <h3>Choose a subject</h3>
+  <div class="subjects" id="subjects"></div>
+  <p id="subjectMessage">Showing all subjects and learning materials.</p>
+</section>
+
+<section id="videos">
+  <div class="row">
+    <div>
+      <h2>🎬 Learning Videos</h2>
+      <p>Watch a lesson or add your own video.</p>
+    </div>
+    <div style="text-align:right">
+      <button class="green" onclick="showForm('videoForm')">＋ UPLOAD VIDEO</button>
+    </div>
+  </div>
+
+  <div id="videoForm" class="form-panel hidden">
+    <h3>Add a learning video</h3>
+    <form id="videoUploadForm">
+      <label for="videoTitle">Video Title</label>
+      <input id="videoTitle" required placeholder="Enter the video title">
+
+      <label for="videoSubject">Choose Subject</label>
+      <select id="videoSubject" required></select>
+
+      <label for="videoFile">Choose a video from your phone or PC (MP4)</label>
+      <input id="videoFile" type="file" accept="video/mp4,video/*">
+
+      <p><strong>OR</strong> paste a YouTube link below.</p>
+      <label for="youtubeLink">YouTube Link</label>
+      <input id="youtubeLink" type="url" placeholder="https://www.youtube.com/watch?v=...">
+      <small>Choose a video file OR enter a YouTube link. Video files are stored in browser storage, not uploaded to the internet.</small>
+      <p id="videoSaveMessage" class="feedback"></p>
+      <button class="green" type="submit">Save Video</button>
+      <button class="gray" type="button" onclick="hideForm('videoForm')">Cancel</button>
+    </form>
+  </div>
+  <div id="videoList" class="cards"></div>
+</section>
+
+<section id="research">
+  <h2>📚 Research Area</h2>
+  <p>Read short information about important topics.</p>
+  <input id="researchSearch" placeholder="Type your topic to research..."
+         oninput="renderResearch()">
+  <button class="green" onclick="showForm('researchForm')">＋ Add New Research</button>
+
+  <div id="researchForm" class="form-panel hidden">
+    <form id="researchUploadForm">
+      <label for="researchTitle">Research title</label>
+      <input id="researchTitle" required placeholder="Enter a title">
+      <label for="researchSummary">Research summary</label>
+      <textarea id="researchSummary" required rows="5"
+                placeholder="Write your research here..."></textarea>
+      <button class="green" type="submit">Save Research</button>
+      <button class="gray" type="button" onclick="hideForm('researchForm')">Cancel</button>
+    </form>
+  </div>
+  <div id="researchList" class="cards"></div>
+</section>
+
+<section id="notes">
+  <h2>📝 Notes and Downloads</h2>
+  <p>Download sample subject notes or add your own PDF notes.</p>
+  <div class="form-panel">
+    <label for="noteFile">Upload a PDF note</label>
+    <input id="noteFile" type="file" accept="application/pdf,.pdf">
+    <label for="noteSubject">Subject</label>
+    <select id="noteSubject"></select>
+    <label for="noteTitle">Note title</label>
+    <input id="noteTitle" placeholder="Enter the note title">
+    <button class="green" onclick="uploadNote()" type="button">Upload Note</button>
+    <p id="noteMessage" class="feedback"></p>
+  </div>
+  <div id="noteList" class="cards"></div>
+</section>
+
+<section id="quiz">
+  <h2>🧠 Test Your Knowledge</h2>
+  <p>Choose one answer for each question. Your result appears at the end.</p>
+  <div id="quizList"></div>
+  <button class="green" onclick="finishQuiz()">Finish Quiz</button>
+  <button class="gray" onclick="resetQuiz()">Try Again</button>
+  <h3 id="quizResult" aria-live="polite"></h3>
+</section>
+
+<section id="progress">
+  <h2>📈 My Progress</h2>
+  <p>Your progress is saved in this browser on this device.</p>
+  <div class="stats">
+    <div class="card"><strong id="watchedCount">0</strong>Videos watched</div>
+    <div class="card"><strong id="bestScore">0/10</strong>Latest quiz score</div>
+    <div class="card"><strong id="favourite">None yet</strong>Favourite subject</div>
+  </div>
+  <p class="muted">To change your favourite subject, select it on the Home page.</p>
+</section>
+</main>
+
+<footer>
+  <h2 style="color:white">Contact Simple Learn UG</h2>
+  <p>WhatsApp: 0772528564</p>
+  <p>Email: <a href="mailto:simplelearnug@gmail.com">simplelearnug@gmail.com</a></p>
+  <p>Made by a Ugandan student, for Ugandan students 🇺🇬</p>
+  <small>Learning is for everyone. Keep practising!</small>
+</footer>
+
+<script>
+const subjects = [
+  "English", "Maths", "Science", "Social Studies", "ICT", "Luganda",
+  "CRE", "Geography", "History", "Biology", "Chemistry", "Physics",
+  "Agriculture", "Art", "Kiswahili"
+];
+
+const $ = id => document.getElementById(id);
+const safe = value => String(value ?? "").replace(/[&<>"']/g, c => ({
+  "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+}[c]));
+
+function read(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+  catch { return fallback; }
+}
+function write(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch (e) {
+    alert("Browser storage is full. Remove some saved videos or notes and try again.");
+    return false;
+  }
+}
+
+let selectedSubject = "All";
+let watched = new Set(read("slug_watched", []));
+let latestScore = read("slug_score", 0);
+let favourite = read("slug_favourite", "None yet");
+let userVideos = read("slug_videos", []);
+let research = read("slug_research", []);
+let notes = read("slug_notes", []);
+let quizAnswers = {};
+let quizSubmitted = false;
+let db;
+
+const examples = [
+  {id:"example1", title:"How to do VLOOKUP in Excel", subject:"ICT",
+   date:"Example lesson", duration:"5 min", type:"youtube",
+   url:"https://www.youtube.com/results?search_query=How+to+do+VLOOKUP+in+Excel",
+   icon:"📊"},
+  {id:"example2", title:"Photosynthesis Explained", subject:"Science",
+   date:"Example lesson", duration:"4 min", type:"youtube",
+   url:"https://www.youtube.com/results?search_query=Photosynthesis+Explained",
+   icon:"🌱"},
+  {id:"example3", title:"How to write a composition", subject:"English",
+   date:"Example lesson", duration:"6 min", type:"youtube",
+   url:"https://www.youtube.com/results?search_query=How+to+write+a+composition",
+   icon:"✍️"}
+];
+
+const articles = [
+  {title:"Ebola", summary:"Ebola is a serious disease caused by a virus. It can spread through direct contact with the blood or body fluids of an infected person or a person who has died from the disease. Avoid contact and seek help from health workers if you suspect Ebola.", subject:"Science"},
+  {title:"HIV/AIDS", summary:"HIV is a virus that attacks the body's immune system. It can be prevented, tested for and treated. Visit a qualified health worker for reliable advice, testing and treatment.", subject:"Science"},
+  {title:"Climate Change", summary:"Climate change means long-term changes in temperatures and weather patterns. Burning fossil fuels adds greenhouse gases to the air. Planting trees and saving energy can help reduce some causes.", subject:"Geography"},
+  {title:"Water Pollution", summary:"Water pollution happens when harmful waste enters rivers, lakes and other water sources. Safe waste disposal, clean water systems and protecting wetlands help keep water safer.", subject:"Science"},
+  {title:"Computers", summary:"A computer is an electronic device that accepts data, processes it, stores it and produces information. Computers are used in schools, hospitals, banks and businesses.", subject:"ICT"},
+  {title:"Uganda History", summary:"Uganda has many communities, kingdoms and cultural traditions. Its modern history includes British colonial rule, independence in 1962 and the development of the country since then.", subject:"History"},
+  {title:"Malaria", summary:"Malaria is caused by parasites spread through bites from infected female Anopheles mosquitoes. Use recommended mosquito nets and seek medical attention for fever or suspected malaria.", subject:"Science"},
+  {title:"Farming in Uganda", summary:"Agriculture supports many Ugandan families. Farmers grow crops such as maize, beans, coffee and bananas, and raise animals. Good soil care, clean water and suitable farming methods support production.", subject:"Agriculture"}
+];
+
+const questions = [
+  {s:"English", q:"Which word is a noun?", a:["Run","Beautiful","Teacher","Quickly"], correct:2, why:"A teacher is a person, so it is a noun."},
+  {s:"English", q:"Choose the correct sentence.", a:["She go to school.","She goes to school.","She going school.","She gone school."], correct:1, why:"We say, 'She goes to school.'"},
+  {s:"Maths", q:"What is 8 × 7?", a:["54","56","64","48"], correct:1, why:"8 multiplied by 7 equals 56."},
+  {s:"Maths", q:"What is half of 100?", a:["20","25","50","75"], correct:2, why:"100 divided by 2 equals 50."},
+  {s:"Science", q:"Which part of a plant absorbs water?", a:["Flower","Root","Fruit","Leaf"], correct:1, why:"Roots take up water from the soil."},
+  {s:"Science", q:"Which gas do humans need for breathing?", a:["Oxygen","Helium","Smoke","Methane"], correct:0, why:"Humans need oxygen to live."},
+  {s:"ICT", q:"Which device is used to type text?", a:["Keyboard","Monitor","Speaker","Projector"], correct:0, why:"A keyboard is used to enter text."},
+  {s:"ICT", q:"What does CPU stand for?", a:["Central Processing Unit","Computer Power Use","Control Print Unit","Central Program User"], correct:0, why:"CPU means Central Processing Unit."},
+  {s:"Social Studies", q:"What is the capital city of Uganda?", a:["Mbarara","Gulu","Kampala","Arua"], correct:2, why:"Kampala is the capital city of Uganda."},
+  {s:"Social Studies", q:"Which is a responsibility of a good citizen?", a:["Destroying property","Following laws","Littering everywhere","Hurting others"], correct:1, why:"Following laws is one responsibility of a citizen."}
+];
+
+function initDB() {
+  return new Promise((resolve, reject) => {
+    if (!("indexedDB" in window)) return reject(new Error("IndexedDB is not supported"));
+    const request = indexedDB.open("SimpleLearnUGFiles", 1);
+    request.onupgradeneeded = () => {
+      const database = request.result;
+      if (!database.objectStoreNames.contains("files"))
+        database.createObjectStore("files", {keyPath:"id"});
+    };
+    request.onsuccess = () => { db = request.result; resolve(db); };
+    request.onerror = () => reject(request.error);
+  });
+}
+function saveFile(id, blob, name, type) {
+  return new Promise((resolve, reject) => {
+    if (!db) return reject(new Error("Browser file storage is unavailable"));
+    const tx = db.transaction("files", "readwrite");
+    tx.objectStore("files").put({id, blob, name, type});
+    tx.oncomplete = resolve;
+    tx.onerror = () => reject(tx.error);
+  });
+}
+function getFile(id) {
+  return new Promise((resolve, reject) => {
+    if (!db) return reject(new Error("Storage is unavailable"));
+    const tx = db.transaction("files", "readonly");
+    const request = tx.objectStore("files").get(id);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+function removeFile(id) {
+  return new Promise(resolve => {
+    if (!db) return resolve();
+    const tx = db.transaction("files", "readwrite");
+    tx.objectStore("files").delete(id);
+    tx.oncomplete = resolve;
+    tx.onerror = resolve;
+  });
+}
+
+function makeSelect(id) {
+  $(id).innerHTML = subjects.map(s =>
+    `<option value="${safe(s)}">${safe(s)}</option>`).join("");
+}
+function showForm(id) { $(id).classList.remove("hidden"); }
+function hideForm(id) { $(id).classList.add("hidden"); }
+function go(id) { $(id).scrollIntoView({behavior:"smooth"}); }
+function toggleDark() {
+  document.body.classList.toggle("dark");
+  const dark = document.body.classList.contains("dark");
+  $("darkBtn").textContent = dark ? "☀️ Light Mode" : "🌙 Dark Mode";
+  localStorage.setItem("slug_dark", dark ? "yes" : "no");
+}
+if (localStorage.getItem("slug_dark") === "yes") {
+  document.body.classList.add("dark");
+  $("darkBtn").textContent = "☀️ Light Mode";
+}
+
+function renderSubjects() {
+  $("subjects").innerHTML = ["All", ...subjects].map(s =>
+    `<button class="subject-btn ${selectedSubject===s?"active":""}"
+     onclick="chooseSubject('${safe(s)}')">${s==="All"?"📚 All Subjects":safe(s)}</button>`
+  ).join("");
+}
+function chooseSubject(s) {
+  selectedSubject = s;
+  if (s !== "All") favourite = s;
+  write("slug_favourite", favourite);
+  renderSubjects(); renderVideos(); renderNotes(); renderProgress();
+  $("subjectMessage").textContent = s === "All"
+    ? "Showing all subjects and learning materials."
+    : "Showing materials for " + s + ".";
+  go("videos");
+}
+function searchTopics(value) {
+  const found = subjects.find(s => s.toLowerCase().includes(value.toLowerCase()));
+  if (!value.trim()) {
+    selectedSubject = "All";
+    $("subjectMessage").textContent = "Showing all subjects and learning materials.";
+    renderSubjects(); renderVideos(); renderNotes(); return;
+  }
+  if (found) {
+    selectedSubject = found;
+    $("subjectMessage").textContent = "Showing materials for " + found + ".";
+  } else {
+    selectedSubject = "All";
+    $("subjectMessage").textContent = "Search videos, research and notes below for: " + value;
+  }
+  renderSubjects(); renderVideos(); renderNotes();
+  $("researchSearch").value = value;
+  renderResearch();
+}
+
+function youtubeId(url) {
+  try {
+    const u = new URL(url);
+    if (u.hostname === "youtu.be") return u.pathname.slice(1);
+    if (u.hostname.endsWith("youtube.com")) {
+      if (u.pathname === "/watch") return u.searchParams.get("v");
+      if (u.pathname.startsWith("/embed/") || u.pathname.startsWith("/shorts/"))
+        return u.pathname.split("/")[2];
+    }
+  } catch {}
+  return null;
+}
+function validYoutube(url) {
+  try {
+    const u = new URL(url);
+    return ["youtube.com","www.youtube.com","m.youtube.com","youtu.be","www.youtu.be"]
+      .includes(u.hostname) && !!youtubeId(url);
+  } catch { return false; }
+}
+function allVideos() { return [...examples, ...userVideos]; }
+
+function renderVideos() {
+  const q = $("topicSearch").value.toLowerCase();
+  const list = allVideos().filter(v =>
+    (selectedSubject === "All" || v.subject === selectedSubject) &&
+    (!q || (v.title + " " + v.subject).toLowerCase().includes(q))
+  );
+  $("videoList").innerHTML = list.length ? list.map(v => `
+    <article class="card">
+      <div class="thumb">${v.icon || "🎬"}</div>
+      <h3>${safe(v.title)}</h3>
+      <p><strong>Subject:</strong> ${safe(v.subject)}</p>
+      <p><strong>Date:</strong> ${safe(v.date)}</p>
+      ${v.duration ? `<p>${safe(v.duration)}</p>` : ""}
+      <div id="player-${safe(v.id)}"></div>
+      <button class="blue" onclick="playVideo('${safe(v.id)}')">▶ Play</button>
+      ${v.user ? `<button class="red" onclick="deleteVideo('${safe(v.id)}')">Delete</button>` : ""}
+    </article>`).join("") : "<p>No videos for this subject yet.</p>";
+}
+async function playVideo(id) {
+  const v = allVideos().find(item => item.id === id);
+  if (!v) return;
+  if (!watched.has(id)) {
+    watched.add(id);
+    write("slug_watched", [...watched]);
+    renderProgress();
+  }
+  const target = $("player-" + id);
+  if (!target) return;
+  if (v.type === "youtube") {
+    const yt = youtubeId(v.url);
+    if (yt) {
+      target.innerHTML = `<iframe title="Video player" allowfullscreen
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(yt)}"></iframe>`;
+    } else {
+      window.open(v.url, "_blank", "noopener");
+    }
+  } else {
+    try {
+      const item = await getFile(v.fileId);
+      if (!item) throw new Error("File not found");
+      const url = URL.createObjectURL(item.blob);
+      target.innerHTML = "";
+      const player = document.createElement("video");
+      player.controls = true;
+      player.playsInline = true;
+      player.src = url;
+      target.appendChild(player);
+      player.play().catch(() => {});
+    } catch {
+      alert("This video is not available. It may have been removed from browser storage.");
+    }
+  }
+}
+async function deleteVideo(id) {
+  const v = userVideos.find(item => item.id === id);
+  if (!v || !confirm("Delete this video?")) return;
+  userVideos = userVideos.filter(item => item.id !== id);
+  if (!write("slug_videos", userVideos)) return;
+  if (v.fileId) await removeFile(v.fileId);
+  watched.delete(id); write("slug_watched", [...watched]);
+  renderVideos(); renderProgress();
+}
+
+$("videoUploadForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const title = $("videoTitle").value.trim();
+  const subject = $("videoSubject").value;
+  const file = $("videoFile").files[0];
+  const link = $("youtubeLink").value.trim();
+  const msg = $("videoSaveMessage");
+  if ((!file && !link) || (file && link)) {
+    msg.textContent = "Choose one: a video file OR a YouTube link.";
+    return;
+  }
+  if (file && !file.type.startsWith("video/")) {
+    msg.textContent = "Please select a video file.";
+    return;
+  }
+  if (link && !validYoutube(link)) {
+    msg.textContent = "Enter a valid YouTube video link.";
+    return;
+  }
+  const id = "video_" + Date.now() + "_" + Math.random().toString(36).slice(2,7);
+  const video = {id, title, subject, date:new Date().toLocaleDateString(),
+    user:true, icon:"🎬"};
+  try {
+    if (file) {
+      if (file.size > 150 * 1024 * 1024) {
+        msg.textContent = "This file is over 150 MB. Try a smaller video.";
+        return;
+      }
+      video.type = "file";
+      video.fileId = id;
+      await saveFile(id, file, file.name, file.type);
+    } else {
+      video.type = "youtube";
+      video.url = link;
+    }
+    userVideos.unshift(video);
+    if (!write("slug_videos", userVideos)) {
+      userVideos = userVideos.filter(v => v.id !== id);
+      if (file) await removeFile(id);
+      return;
+    }
+    event.target.reset();
+    msg.textContent = "Video saved! It is now in the Videos Area.";
+    renderVideos();
+  } catch (e) {
+    msg.textContent = "Could not save the file. Check browser storage and try again.";
+  }
+});
+
+function renderResearch() {
+  const q = $("researchSearch").value.toLowerCase().trim();
+  const list = [...articles, ...research].filter(a =>
+    (a.title + " " + a.summary).toLowerCase().includes(q));
+  $("researchList").innerHTML = list.length ? list.map((a,i) => `
+    <article class="card">
+      <h3>${safe(a.title)}</h3>
+      <p>${safe(a.summary.slice(0,145))}${a.summary.length>145?"…":""}</p>
+      <button class="blue" onclick="readResearch(${i}, '${safe(a.title).replace(/'/g,"&#39;")}')">Read More</button>
+    </article>`).join("") : "<p>No research found. Try another word.</p>";
+}
+function readResearch(index, title) {
+  const q = $("researchSearch").value.toLowerCase().trim();
+  const list = [...articles, ...research].filter(a =>
+    (a.title + " " + a.summary).toLowerCase().includes(q));
+  const item = list[index];
+  if (item) alert(item.title + "\n\n" + item.summary);
+}
+$("researchUploadForm").addEventListener("submit", event => {
+  event.preventDefault();
+  research.unshift({
+    title:$("researchTitle").value.trim(),
+    summary:$("researchSummary").value.trim()
+  });
+  if (!write("slug_research", research)) {
+    research.shift(); return;
+  }
+  event.target.reset(); hideForm("researchForm"); renderResearch();
+});
+
+function downloadText(filename, text) {
+  const blob = new Blob([text], {type:"text/plain;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function makePDF(title, body) {
+  const esc = s => String(s).replace(/\\/g,"\\\\").replace(/\(/g,"\\(").replace(/\)/g,"\\)");
+  const lines = (title + "\n\n" + body).split("\n");
+  const commands = ["BT", "/F1 16 Tf", "50 790 Td"];
+  lines.slice(0,45).forEach((line,i) => {
+    if (i) commands.push("0 -17 Td");
+    commands.push("/F1 11 Tf", "(" + esc(line.slice(0,100)) + ") Tj");
+  });
+  commands.push("ET");
+  const stream = commands.join("\n");
+  const objects = [
+    "<< /Type /Catalog /Pages 2 0 R >>",
+    "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+    "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
+    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+    `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`
+  ];
+  let pdf = "%PDF-1.4\n", offsets = [0];
+  objects.forEach((obj,i) => {
+    offsets.push(pdf.length);
+    pdf += `${i+1} 0 obj\n${obj}\nendobj\n`;
+  });
+  const xref = pdf.length;
+  pdf += `xref\n0 ${objects.length+1}\n0000000000 65535 f \n`;
+  for (let i=1;i<offsets.length;i++)
+    pdf += String(offsets[i]).padStart(10,"0")+" 00000 n \n";
+  pdf += `trailer\n<< /Size ${objects.length+1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+  return new Blob([pdf], {type:"application/pdf"});
+}
+function downloadSample(subject) {
+  const body = `Simple Learn UG - ${subject} notes\n\nThese are starter notes for revision.\n\nStudy the key terms, write your own examples, and ask your teacher when you need help.\n\nSubject: ${subject}\n\nTip: Add more detailed notes from your class lessons and textbooks.`;
+  const blob = makePDF(subject + " Study Notes", body);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = subject.toLowerCase().replace(/\s+/g,"-")+"-notes.pdf";
+  a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+async function uploadNote() {
+  const file = $("noteFile").files[0];
+  const title = $("noteTitle").value.trim() || (file ? file.name : "");
+  const subject = $("noteSubject").value;
+  if (!file || file.type !== "application/pdf") {
+    $("noteMessage").textContent = "Choose a PDF file first.";
+    return;
+  }
+  const id = "note_" + Date.now();
+  try {
+    await saveFile(id, file, file.name, file.type);
+    notes.unshift({id, title, subject, date:new Date().toLocaleDateString(), user:true});
+    if (!write("slug_notes", notes)) {
+      notes.shift(); await removeFile(id); return;
+    }
+    $("noteFile").value = ""; $("noteTitle").value = "";
+    $("noteMessage").textContent = "PDF note saved!";
+    renderNotes();
+  } catch {
+    $("noteMessage").textContent = "Could not save the PDF. Check browser storage.";
+  }
+}
+async function downloadUserNote(id) {
+  try {
+    const file = await getFile(id);
+    if (!file) throw new Error();
+    const url = URL.createObjectURL(file.blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = file.name || "study-note.pdf"; a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  } catch { alert("This PDF is not available in browser storage."); }
+}
+async function deleteNote(id) {
+  if (!confirm("Delete this note?")) return;
+  notes = notes.filter(n => n.id !== id);
+  if (write("slug_notes", notes)) {
+    await removeFile(id); renderNotes();
+  }
+}
+function renderNotes() {
+  const sample = subjects
+    .filter(s => selectedSubject === "All" || s === selectedSubject)
+    .map(s => ({id:"sample_"+s, title:s+" Study Notes", subject:s, sample:true}));
+  const uploaded = notes.filter(n => selectedSubject === "All" || n.subject === selectedSubject);
+  const list = [...uploaded, ...sample];
+  $("noteList").innerHTML = list.map(n => `
+    <article class="card">
+      <h3>${safe(n.title)}</h3>
+      <p><strong>Subject:</strong> ${safe(n.subject)}</p>
+      ${n.date?`<small>Added: ${safe(n.date)}</small>`:""}
+      <p><button class="blue" onclick="${n.sample
+        ? `downloadSample('${safe(n.subject)}')`
+        : `downloadUserNote('${safe(n.id)}')`}">⬇ Download PDF</button></p>
+      ${n.user?`<button class="red" onclick="deleteNote('${safe(n.id)}')">Delete</button>`:""}
+    </article>`).join("");
+}
+
+function renderQuiz() {
+  $("quizList").innerHTML = questions.map((q,i) => `
+    <article class="card" style="margin:12px 0">
+      <p><strong>Question ${i+1} of 10 — ${safe(q.s)}</strong></p>
+      <p>${safe(q.q)}</p>
+      ${q.a.map((answer,j)=>`
+        <button class="answer ${quizSubmitted && j===q.correct?"correct":""}
+          ${quizSubmitted && quizAnswers[i]===j && j!==q.correct?"wrong":""}"
+          ${quizSubmitted?"disabled":""}
+          onclick="answerQuestion(${i},${j})">${String.fromCharCode(65+j)}. ${safe(answer)}</button>
+      `).join("")}
+      <p id="feedback-${i}" class="feedback" aria-live="polite">${
+        quizSubmitted ? (quizAnswers[i]===q.correct
+          ? "Correct! " : "Wrong. ") + safe(q.why) : ""}</p>
+    </article>`).join("");
+}
+function answerQuestion(i,j) {
+  if (quizSubmitted) return;
+  quizAnswers[i] = j;
+  const q = questions[i];
+  const f = $("feedback-"+i);
+  f.textContent = j===q.correct ? "Correct! " + q.why : "Wrong. Try again!";
+  f.style.color = j===q.correct ? "#168447" : "#b42323";
+}
+function finishQuiz() {
+  const score = questions.reduce((sum,q,i)=>sum+(quizAnswers[i]===q.correct?1:0),0);
+  quizSubmitted = true;
+  latestScore = score;
+  write("slug_score", latestScore);
+  renderQuiz();
+  $("quizResult").textContent = `You got ${score}/10`;
+  renderProgress();
+}
+function resetQuiz() {
+  quizAnswers = {}; quizSubmitted = false;
+  $("quizResult").textContent = "";
+  renderQuiz();
+}
+function renderProgress() {
+  $("watchedCount").textContent = watched.size;
+  $("bestScore").textContent = latestScore + "/10";
+  $("favourite").textContent = favourite;
+}
+
+async function start() {
+  makeSelect("videoSubject"); makeSelect("noteSubject");
+  renderSubjects(); renderVideos(); renderResearch(); renderNotes();
+  renderQuiz(); renderProgress();
+  try { await initDB(); }
+  catch { alert("This browser does not support file storage. Video and PDF uploads may not work."); }
+}
+start();
+</script>
+</body>
+</html>
